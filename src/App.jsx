@@ -156,6 +156,12 @@ useEffect(() => {
 
   async function generateWallet() {
     try {
+      if (phrase || wallets.length > 0) {
+  setError(
+    'A wallet already exists. Use + Add Wallet to create another wallet safely.'
+  )
+  return
+}
       const newPhrase = generateMnemonic(128)
 
       const seed = mnemonicToSeedSync(newPhrase)
