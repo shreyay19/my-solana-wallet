@@ -55,6 +55,7 @@ function App() {
   const [phrase, setPhrase] = useState(
   () => localStorage.getItem('walletPhrase') || ''
 )
+const [restorePhraseInput, setRestorePhraseInput] = useState('')
   const [solBalance, setSolBalance] = useState('0.00')
   const [usdcBalance, setUsdcBalance] = useState('0.00')
   const [error, setError] = useState('')
@@ -184,6 +185,71 @@ setSolBalance((Number(balance) / 1_000_000_000).toFixed(4))
   setError(err.message)
 }
   }
+  async function restoreExistingWallet() {
+  try {
+    const oldPhrase = restorePhraseInput.trim().toLowerCase()
+
+    if (!oldPhrase) {
+      throw new Error('Please enter your recovery phrase.')
+    }
+
+    const seed = mnemonicToSeedSync(oldPhrase)
+    const seedHex = Buffer.from(seed).toString('hex')
+
+    const derivedSeed = derivePath(
+      "m/44'/501'/0'/0'",
+      seedHex
+    ).key
+
+    const keypair = Keypair.fromSeed(derivedSeed)
+    const address = keypair.publicKey.toBase58()
+
+    setPhrase(oldPhrase)
+    setWallet(address)
+    setWallets([address])
+    setWalletCount(1)
+    setSelectedWalletIndex(0)
+
+    localStorage.setItem('walletPhrase', oldPhrase)
+    localStorage.setItem('walletCount', '1')
+    localStorage.setItem('selectedWalletIndex', '0')
+
+    const balance = await connection.getBalance(keypair.publicKey)
+
+    setSolBalance(
+      (balance / LAMPORTS_PER_SOL).toFixed(4)
+    )
+
+    const tokenAddress = await getAssociatedTokenAddress(
+      USDC_MINT,
+      keypair.publicKey,
+      false,
+      TOKEN_PROGRAM_ID
+    )
+
+    try {
+      const tokenAccount = await getAccount(
+        connection,
+        tokenAddress,
+        'confirmed',
+        TOKEN_PROGRAM_ID
+      )
+
+      setUsdcBalance(
+        (Number(tokenAccount.amount) / 1_000_000).toFixed(2)
+      )
+    } catch {
+      setUsdcBalance('0.00')
+    }
+
+    setRestorePhraseInput('')
+    setError('')
+
+  } catch (err) {
+    console.error('Wallet Restore Error:', err)
+    setError(err.message)
+  }
+}
     async function requestAirdrop() {
     try {
       if (!wallet) {
@@ -769,6 +835,26 @@ return (
           ) : (
             <p className="empty-state">No wallet generated yet. Create your first wallet below.</p>
           )}
+          <div className="restore-wallet-section">
+  <h3>Restore existing wallet</h3>
+  <p>Enter your previously saved recovery phrase.</p>
+
+  <input
+    type="password"
+    placeholder="Enter your 12-word recovery phrase"
+    value={restorePhraseInput}
+    onChange={(e) => setRestorePhraseInput(e.target.value)}
+    autoComplete="off"
+  />
+
+  <button
+    className="secondary-button"
+    onClick={restoreExistingWallet}
+    disabled={!restorePhraseInput.trim()}
+  >
+    Restore wallet
+  </button>
+</div>
 
           <div className="wallet-actions">
             <button onClick={generateWallet}>
