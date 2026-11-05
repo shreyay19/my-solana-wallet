@@ -627,170 +627,308 @@ async function selectWallet(index) {
     setError(err.message)
   }
 }
-  return (
-    <div className="app">
-      <nav className="navbar">
-        <h2>◎ Solana Wallet</h2>
-        <span className="network">Devnet</span>
-      </nav>
+  
+    
+return (
+  <div className="app">
+    <nav className="navbar">
+      <div className="brand">
+        <span className="brand-icon">◎</span>
+        <div>
+          <h2>solana wallet</h2>
+          <p>Your Web3 dashboard</p>
+        </div>
+      </div>
 
-      <main className="dashboard">
-        <h1>Welcome to Your Wallet</h1>
-        <p className="subtitle">
-          Manage your Solana assets in one place.
-        </p>
+      <div className="network">
+        <span className="network-dot"></span>
+        Solana Devnet
+      </div>
+    </nav>
 
-        <section className="balance-card">
-          <p>Total SOL Balance</p>
-          <h1>{solBalance} SOL</h1>
-          <span>≈ $0.00 USD</span>
-        </section>
+    <main className="dashboard">
+      <header className="page-heading">
+        <div>
+          <p className="eyebrow">YOUR WEB3 HOME</p>
+          <h1>Wallet overview</h1>
+          <p className="subtitle">
+            Manage your assets, wallets and transactions in one place.
+          </p>
+        </div>
+
+        <div className="connection-status">
+          <span className="network-dot"></span>
+          {wallet ? 'Wallet connected' : 'No wallet connected'}
+        </div>
+      </header>
+
+      {/* Main SOL balance */}
+      <section className="balance-card">
+        <div className="balance-top">
+          <div>
+            <p className="balance-label">TOTAL SOL BALANCE</p>
+            <h1>{solBalance} <span>SOL</span></h1>
+            <p className="balance-usd">≈ $0.00 USD</p>
+          </div>
+
+          <div className="sol-symbol">◎</div>
+        </div>
+
+        <div className="balance-actions">
+          <button onClick={requestAirdrop} disabled={!wallet}>
+            + Get Test SOL
+          </button>
+
+          <button className="secondary-button" onClick={refreshBalance} disabled={!wallet}>
+            ↻ Refresh balance
+          </button>
+        </div>
+      </section>
+
+      {/* Token balances */}
+      <section className="section-block">
+        <div className="section-heading">
+          <div>
+            <h2>Your assets</h2>
+            <p>Overview of your Devnet token balances.</p>
+          </div>
+        </div>
 
         <div className="token-grid">
           <section className="token-card">
-            <h3>◎ Solana</h3>
+            <div className="token-heading">
+              <span className="token-icon sol-icon">◎</span>
+              <span className="token-name">Solana</span>
+            </div>
             <h2>{solBalance} SOL</h2>
-            <p>Your SOL balance</p>
+            <p>Native network token</p>
+            <button className="text-button" onClick={refreshBalance} disabled={!wallet}>
+              Refresh balance ↻
+            </button>
           </section>
 
           <section className="token-card">
-            <h3>💵 USDC</h3>
+            <div className="token-heading">
+              <span className="token-icon usdc-icon">$</span>
+              <span className="token-name">USDC</span>
+            </div>
             <h2>{usdcBalance} USDC</h2>
-            <p>Your USDC balance</p>
+            <p>USD Coin on Devnet</p>
+            <button className="text-button" onClick={refreshUsdcBalance} disabled={!wallet}>
+              Refresh balance ↻
+            </button>
           </section>
+
           <section className="token-card">
-  <h3>💵 devUSDC</h3>
-  <h2>{devUsdcBalance} devUSDC</h2>
-  <p>Your Orca Devnet token balance</p>
-</section>
+            <div className="token-heading">
+              <span className="token-icon dev-icon">◈</span>
+              <span className="token-name">devUSDC</span>
+            </div>
+            <h2>{devUsdcBalance} devUSDC</h2>
+            <p>Orca swap token</p>
+            <button className="text-button" onClick={refreshDevUsdcBalance} disabled={!wallet}>
+              Refresh balance ↻
+            </button>
+          </section>
+        </div>
+      </section>
+
+      {/* Wallet management */}
+      <section className="section-block">
+        <div className="section-heading">
+          <div>
+            <h2>Wallet management</h2>
+            <p>Create and manage your Solana wallets.</p>
+          </div>
         </div>
 
-        <section className="wallet-card">
-          <h3>Your Wallet</h3>
+        <section className="wallet-card panel">
+          <div className="panel-heading">
+            <div>
+              <h3>My wallet</h3>
+              <p>Your selected wallet details</p>
+            </div>
+            <span className="wallet-badge">
+              {wallet ? 'Active wallet' : 'Not created'}
+            </span>
+          </div>
 
           {wallet ? (
             <>
-              <p>Wallet generated successfully!</p>
+              <p className="field-label">WALLET ADDRESS</p>
               <p className="address">{wallet}</p>
 
-              <h3>Recovery Phrase</h3>
-              <p className="phrase">{phrase}</p>
-              <p className="warning">
-                Keep this phrase private. Anyone who has it
-                can access your wallet.
-              </p>
+              <details className="phrase-panel">
+                <summary>View recovery phrase</summary>
+                <p className="phrase">{phrase}</p>
+                <p className="warning">
+                  Never share your recovery phrase. Anyone with it can access your wallet.
+                </p>
+              </details>
             </>
           ) : (
-            <p>No wallet generated yet.</p>
+            <p className="empty-state">No wallet generated yet. Create your first wallet below.</p>
           )}
 
-          <button onClick={generateWallet}>
-            Generate Wallet
-          </button>
-          <button onClick={addWallet} disabled={!phrase}>
-  Generate Another Wallet
-</button>
-          <button onClick={requestAirdrop} disabled={!wallet}>
-  Request 1 Test SOL
-</button>
-<button onClick={refreshBalance} disabled={!wallet}>
-  Refresh Balance
-</button>
-<button onClick={refreshUsdcBalance} disabled={!wallet}>
-  Refresh USDC Balance
-</button>
-<button onClick={refreshDevUsdcBalance} disabled={!wallet}>
-  Refresh devUSDC Balance
-</button>
+          <div className="wallet-actions">
+            <button onClick={generateWallet}>
+              Generate wallet
+            </button>
+            <button className="secondary-button" onClick={addWallet} disabled={!phrase}>
+              + Add wallet
+            </button>
+          </div>
 
-          {error && <p className="warning">{error}</p>}
-          <h3>All Your Wallets</h3>
+          {error && <p className="warning error-message">{error}</p>}
 
-{wallets.map((address, index) => (
-  <div
-    className="address"
-    key={index}
-    onClick={() => selectWallet(index)}
-    style={{
-      cursor: 'pointer',
-      border: selectedWalletIndex === index
-        ? '2px solid #9945ff'
-        : '1px solid #475569',
-      padding: '12px',
-      marginBottom: '10px',
-      borderRadius: '10px'
-    }}
-  >
-    <p>Wallet {index + 1}</p>
-    <p>{address}</p>
+          <div className="wallet-list-heading">
+            <h3>All your wallets</h3>
+            <span>{wallets.length} wallet(s)</span>
+          </div>
 
-    {selectedWalletIndex === index && (
-      <p>✓ Selected Wallet</p>
-    )}
-  </div>
-))}
+          <div className="wallet-list">
+            {wallets.map((address, index) => (
+              <div
+                className={`wallet-option ${
+                  selectedWalletIndex === index ? 'selected' : ''
+                }`}
+                key={index}
+                onClick={() => selectWallet(index)}
+              >
+                <div>
+                  <strong>Wallet {index + 1}</strong>
+                  <p>{address}</p>
+                </div>
+
+                {selectedWalletIndex === index && (
+                  <span className="selected-label">✓ Selected</span>
+                )}
+              </div>
+            ))}
+          </div>
         </section>
-      </main>
-      <div className="send-section">
-  <h2>Send SOL</h2>
+      </section>
 
-  <input
-    type="text"
-    placeholder="Recipient Wallet Address"
-    value={recipientAddress}
-    onChange={(e) => setRecipientAddress(e.target.value)}
-  />
+      {/* Transactions */}
+      <section className="section-block">
+        <div className="section-heading">
+          <div>
+            <h2>Transactions</h2>
+            <p>Send SOL or exchange tokens through Orca.</p>
+          </div>
+        </div>
 
-  <input
-    type="number"
-    placeholder="Amount in SOL"
-    value={sendAmount}
-    onChange={(e) => setSendAmount(e.target.value)}
-  />
+        <div className="transaction-grid">
+          {/* Send SOL */}
+          <section className="send-section panel">
+            <div className="panel-heading">
+              <div>
+                <h3>Send SOL</h3>
+                <p>Transfer SOL to another wallet.</p>
+              </div>
+              <span className="panel-icon">↗</span>
+            </div>
 
-  <button onClick={sendSol}>
-    Send SOL
-  </button>
+            <label className="field-label">RECIPIENT ADDRESS</label>
+            <input
+              type="text"
+              placeholder="Enter recipient wallet address"
+              value={recipientAddress}
+              onChange={(e) => setRecipientAddress(e.target.value)}
+            />
 
-  {sendStatus && <p>{sendStatus}</p>}
-</div>
-<section className="send-section">
-  <h2>Orca SOL to devUSDC Swap</h2>
+            <label className="field-label">AMOUNT IN SOL</label>
+            <input
+              type="number"
+              placeholder="0.00"
+              value={sendAmount}
+              onChange={(e) => setSendAmount(e.target.value)}
+            />
 
-  <button onClick={checkOrcaPool}>
-    Check Orca Pool
-  </button>
+            <button className="primary-action" onClick={sendSol} disabled={!wallet}>
+              Send SOL
+            </button>
 
-  <input
-    type="number"
-    placeholder="Enter SOL amount"
-    value={swapAmount}
-    onChange={(e) => setSwapAmount(e.target.value)}
-    min="0"
-    step="0.000000001"
-  />
+            {sendStatus && (
+              <p className="transaction-status">{sendStatus}</p>
+            )}
+          </section>
 
-  <button onClick={getSolToDevUsdcQuote}>
-    Get Swap Quote
-  </button>
-  <button
-  onClick={executeSolToDevUsdcSwap}
-  disabled={isSwapping || !swapAmount}
->
-  {isSwapping ? 'Swapping...' : 'Swap SOL for devUSDC'}
-</button>
+          {/* Orca swap */}
+          <section className="send-section swap-section panel">
+            <div className="panel-heading">
+              <div>
+                <h3>Orca Swap</h3>
+                <p>Exchange SOL for devUSDC.</p>
+              </div>
+              <span className="panel-icon swap-icon">⇄</span>
+            </div>
 
-  {swapStatus && <p>{swapStatus}</p>}
+            <div className="swap-pair">
+              <div>
+                <span>FROM</span>
+                <strong>◎ SOL</strong>
+              </div>
+              <span className="swap-arrow">↓</span>
+              <div>
+                <span>TO</span>
+                <strong>◈ devUSDC</strong>
+              </div>
+            </div>
 
-  {swapQuote && (
-  <p>
-    Estimated devUSDC:{' '}
-    {(Number(swapQuote.estimatedAmountOut.toString()) / 1000000).toFixed(6)}
-  </p>
-)}
-</section>
-    </div>
-  )
+            <label className="field-label">AMOUNT IN SOL</label>
+            <input
+              type="number"
+              placeholder="Enter SOL amount"
+              value={swapAmount}
+              onChange={(e) => setSwapAmount(e.target.value)}
+              min="0"
+              step="0.000000001"
+            />
+
+            <button className="secondary-button pool-button" onClick={checkOrcaPool}>
+              Check Orca pool
+            </button>
+
+            <button
+              className="primary-action"
+              onClick={getSolToDevUsdcQuote}
+              disabled={!wallet || !swapAmount}
+            >
+              Get swap quote
+            </button>
+
+            <button
+              className="primary-action swap-action"
+              onClick={executeSolToDevUsdcSwap}
+              disabled={isSwapping || !wallet || !swapAmount}
+            >
+              {isSwapping ? 'Swapping...' : 'Swap SOL for devUSDC'}
+            </button>
+
+            {swapQuote && (
+              <div className="quote-result">
+                <span>Estimated output</span>
+                <strong>
+                  {(Number(swapQuote.estimatedAmountOut.toString()) / 1000000).toFixed(6)} devUSDC
+                </strong>
+              </div>
+            )}
+
+            {swapStatus && (
+              <p className="transaction-status">{swapStatus}</p>
+            )}
+          </section>
+        </div>
+      </section>
+
+      <footer className="footer">
+        <p>Built on Solana Devnet · Powered by Orca</p>
+      </footer>
+    </main>
+  </div>
+)
+
 }
 
 export default App
